@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"os"
-	"os/user"
 	"path/filepath"
 )
 
@@ -63,13 +62,9 @@ func Read() (Config, error) {
 	return config, nil
 }
 
-func (cfg *Config) SetUser() error {
-	currentUser, err := user.Current()
-	if err != nil {
-		return err
-	}
+func (cfg *Config) SetUser(username string) error {
 
-	cfg.CurrentUserName = currentUser.Username
+	cfg.CurrentUserName = username
 
 	if err := write(cfg); err != nil {
 		return err
