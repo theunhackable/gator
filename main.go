@@ -35,6 +35,10 @@ func main() {
 		Arguments: os.Args,
 		Name:      "reset",
 	}
+	cmdUsers := models.Command{
+		Arguments: os.Args,
+		Name:      "users",
+	}
 
 	cmds := models.Commands{
 		Registered: make(map[string]func(s *models.State, c models.Command) error),
@@ -42,6 +46,7 @@ func main() {
 	cmds.Register("login", handlers.HandlerLogin)
 	cmds.Register("register", handlers.HandlerRegister)
 	cmds.Register("reset", handlers.HandlerReset)
+	cmds.Register("users", handlers.HandlerUsers)
 
 	login, ok := cmds.Registered["login"]
 	if !ok {
@@ -54,7 +59,14 @@ func main() {
 	}
 
 	reset, ok := cmds.Registered["reset"]
+	if !ok {
+		os.Exit(1)
+	}
 
+	users, ok := cmds.Registered["users"]
+	if !ok {
+		os.Exit(1)
+	}
 	switch os.Args[1] {
 	case "login":
 		if err := login(&state, cmdLogin); err != nil {
@@ -77,6 +89,11 @@ func main() {
 			os.Exit(1)
 		} else {
 			fmt.Println("Db Reset done.")
+		}
+	case "users":
+		if err := users(&state, cmdUsers); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
 	}
 }
