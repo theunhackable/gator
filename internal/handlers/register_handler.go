@@ -37,7 +37,10 @@ func HandlerRegister(s *models.State, cmd models.Command) error {
 	if err != nil {
 		return fmt.Errorf("Error registering user: %w", err)
 	}
+	if err := s.State.SetUser(user.Name); err != nil {
+		return err
+	}
 
-	fmt.Printf("User %s has been registered.\n", user.Name)
+	fmt.Printf("%s\n", user.Name)
 	return nil
 }

@@ -48,3 +48,12 @@ func (q *Queries) GetUserByUsername(ctx context.Context, name string) (string, e
 	err := row.Scan(&name)
 	return name, err
 }
+
+const resetUserTable = `-- name: ResetUserTable :exec
+DELETE FROM users
+`
+
+func (q *Queries) ResetUserTable(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, resetUserTable)
+	return err
+}

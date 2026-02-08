@@ -11,3 +11,5 @@ RETURNING *;
 SELECT name FROM users
 WHERE name = $1;
 
+-- name: ResetUserTable :exec
+DELETE FROM users;
