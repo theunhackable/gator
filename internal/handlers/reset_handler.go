@@ -12,6 +12,10 @@ func HandlerReset(s *models.State, cmd models.Command) error {
 		return err
 	}
 
+	if err := s.Db.ResetFeedTable(ctx); err != nil {
+		return err
+	}
+
 	return nil
 
 }

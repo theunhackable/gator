@@ -20,10 +20,10 @@ func HandlerRegister(s *models.State, cmd models.Command) error {
 	username := cmd.Arguments[expArgLen-1]
 
 	getCtx := context.Background()
-	name, err := s.Db.GetUserByUsername(getCtx, username)
+	existingUser, err := s.Db.GetUserDetailsByUsername(getCtx, username)
 
 	if err == nil {
-		return fmt.Errorf("User %s already exists.\n", name)
+		return fmt.Errorf("User %s already exists.\n", existingUser.Name)
 	}
 	var newUser db.CreateUserParams
 

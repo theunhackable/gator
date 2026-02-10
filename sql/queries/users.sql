@@ -7,8 +7,8 @@ VALUES (
 )
 RETURNING *;
 
--- name: GetUserByUsername :one
-SELECT name FROM users
+-- name: GetUserDetailsByUsername :one
+SELECT * FROM users
 WHERE name = $1;
 
 -- name: ResetUserTable :exec

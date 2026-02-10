@@ -17,14 +17,14 @@ func HandlerLogin(s *models.State, cmd models.Command) error {
 	}
 	username := cmd.Arguments[expArgLen-1]
 	getCtx := context.Background()
-	name, err := s.Db.GetUserByUsername(getCtx, username)
+	user, err := s.Db.GetUserDetailsByUsername(getCtx, username)
 
 	if err != nil {
-		fmt.Printf("User %s not found\n", name)
+		fmt.Printf("User %s not found\n", user.Name)
 		os.Exit(1)
 	}
 
-	if err := s.State.SetUser(name); err != nil {
+	if err := s.State.SetUser(user.Name); err != nil {
 		return err
 	}
 	return nil
