@@ -13,3 +13,8 @@ RETURNING *;
 -- name: ResetFeedTable :exec
 DELETE FROM users;
 
+-- name: GetFeedDetails :many
+
+SELECT u.name AS username, f.name AS feed_name, f.url  AS url
+FROM users as u INNER JOIN feeds as f
+ON f.user_id = u.id;

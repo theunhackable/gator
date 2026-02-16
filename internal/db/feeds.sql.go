@@ -52,6 +52,42 @@ func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (Feed, e
 	return i, err
 }
 
+const getFeedDetails = `-- name: GetFeedDetails :many
+
+SELECT u.name AS username, f.name AS feed_name, f.url  AS url
+FROM users as u INNER JOIN feeds as f
+ON f.user_id = u.id
+`
+
+type GetFeedDetailsRow struct {
+	Username string
+	FeedName string
+	Url      string
+}
+
+func (q *Queries) GetFeedDetails(ctx context.Context) ([]GetFeedDetailsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFeedDetails)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFeedDetailsRow
+	for rows.Next() {
+		var i GetFeedDetailsRow
+		if err := rows.Scan(&i.Username, &i.FeedName, &i.Url); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const resetFeedTable = `-- name: ResetFeedTable :exec
 DELETE FROM users
 `
