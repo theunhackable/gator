@@ -88,6 +88,26 @@ func (q *Queries) GetFeedDetails(ctx context.Context) ([]GetFeedDetailsRow, erro
 	return items, nil
 }
 
+const getFeedDetailsByUrl = `-- name: GetFeedDetailsByUrl :one
+
+SELECT id, user_id, name, url, created_at, updated_at FROM feeds
+WHERE url =  $1
+`
+
+func (q *Queries) GetFeedDetailsByUrl(ctx context.Context, url string) (Feed, error) {
+	row := q.db.QueryRowContext(ctx, getFeedDetailsByUrl, url)
+	var i Feed
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.Url,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const resetFeedTable = `-- name: ResetFeedTable :exec
 DELETE FROM users
 `

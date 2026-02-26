@@ -6,12 +6,16 @@ import (
 	"time"
 
 	"github.com/theunhackable/gator/internal/db"
+	"github.com/theunhackable/gator/internal/helpers"
 	"github.com/theunhackable/gator/internal/models"
 )
 
 func HandlerAddFeed(s *models.State, cmd models.Command) error {
-	if len(cmd.Arguments) < 4 {
-		return fmt.Errorf("not enough arguments.")
+
+	argLen := len(cmd.Arguments)
+	expArgLen := 4
+	if argLen != expArgLen {
+		return helpers.ExpectedRequired(expArgLen, argLen)
 	}
 
 	name := cmd.Arguments[2]
@@ -23,7 +27,6 @@ func HandlerAddFeed(s *models.State, cmd models.Command) error {
 	if err != nil {
 		return err
 	}
-
 	newFeed := db.CreateFeedParams{
 		UserID:    user.ID,
 		Name:      name,
@@ -37,6 +40,17 @@ func HandlerAddFeed(s *models.State, cmd models.Command) error {
 
 	if err != nil {
 		return err
+	}
+
+	_, feedFollowErr := s.Db.CreateFeedFollow(ctx, db.CreateFeedFollowParams{
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+		UpdatedAt: time.Now(),
+		CreatedAt: time.Now(),
+	})
+
+	if feedFollowErr != nil {
+		return feedFollowErr
 	}
 
 	fmt.Printf("feed name '%s' inserted successfully\n", feed.Name)

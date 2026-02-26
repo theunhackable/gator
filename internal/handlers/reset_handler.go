@@ -16,6 +16,14 @@ func HandlerReset(s *models.State, cmd models.Command) error {
 		return err
 	}
 
+	if err := s.Db.ResetFeedFollowTable(ctx); err != nil {
+		return err
+	}
+
+	if err := s.State.DeleteUser(); err != nil {
+		return err
+	}
+
 	return nil
 
 }

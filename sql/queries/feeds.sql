@@ -18,3 +18,8 @@ DELETE FROM users;
 SELECT u.name AS username, f.name AS feed_name, f.url  AS url
 FROM users as u INNER JOIN feeds as f
 ON f.user_id = u.id;
+
+-- name: GetFeedDetailsByUrl :one
+
+SELECT * FROM feeds
+WHERE url =  $1;

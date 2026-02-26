@@ -71,3 +71,11 @@ func (cfg *Config) SetUser(username string) error {
 	}
 	return nil
 }
+
+func (cfg *Config) DeleteUser() error {
+	cfg.CurrentUserName = ""
+	if err := write(cfg); err != nil {
+		return err
+	}
+	return nil
+}

@@ -11,7 +11,6 @@ import (
 )
 
 func HandlerRegister(s *models.State, cmd models.Command) error {
-	fmt.Println("start of register")
 	argLen := len(cmd.Arguments)
 	expArgLen := 3
 	if argLen != expArgLen {
