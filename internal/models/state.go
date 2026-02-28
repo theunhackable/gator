@@ -8,4 +8,5 @@ import (
 type State struct {
 	Db    *db.Queries
 	State *config.Config
+	User  *db.User
 }

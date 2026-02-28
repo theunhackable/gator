@@ -3,12 +3,14 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"os"
+
 	_ "github.com/lib/pq"
 	"github.com/theunhackable/gator/internal/config"
 	"github.com/theunhackable/gator/internal/db"
 	"github.com/theunhackable/gator/internal/handlers"
+	"github.com/theunhackable/gator/internal/middleware"
 	"github.com/theunhackable/gator/internal/models"
-	"os"
 )
 
 func main() {
@@ -31,10 +33,11 @@ func main() {
 	cmds.Register("reset", handlers.HandlerReset)
 	cmds.Register("users", handlers.HandlerUsers)
 	cmds.Register("agg", handlers.HandlerAgg)
-	cmds.Register("addfeed", handlers.HandlerAddFeed)
+	cmds.Register("addfeed", middleware.MiddlewareLoggedIn(handlers.HandlerAddFeed))
 	cmds.Register("feeds", handlers.HandlerFeeds)
-	cmds.Register("follow", handlers.HandlerFollow)
-	cmds.Register("following", handlers.HandlerFollowing)
+	cmds.Register("follow", middleware.MiddlewareLoggedIn(handlers.HandlerFollow))
+	cmds.Register("following", middleware.MiddlewareLoggedIn(handlers.HandlerFollowing))
+	cmds.Register("unfollow", middleware.MiddlewareLoggedIn(handlers.HandlerUnfollow))
 
 	args := os.Args
 	cmd, ok := cmds.Registered[args[1]]

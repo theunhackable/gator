@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/theunhackable/gator/internal/db"
 	"github.com/theunhackable/gator/internal/models"
 )
 
-func HandlerFollowing(s *models.State, cmd models.Command) error {
+func HandlerFollowing(s *models.State, cmd models.Command, user *db.User) error {
 	ctx := context.Background()
-	details, err := s.Db.GetFeedFollowsForUser(ctx, s.State.CurrentUserName)
+	details, err := s.Db.GetFeedFollowsForUser(ctx, user.Name)
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/theunhackable/gator/internal/models"
 )
 
-func HandlerFollow(s *models.State, cmd models.Command) error {
+func HandlerFollow(s *models.State, cmd models.Command, user *db.User) error {
 
 	argLen := len(cmd.Arguments)
 	expArgLen := 3
@@ -25,12 +25,6 @@ func HandlerFollow(s *models.State, cmd models.Command) error {
 		return err
 	}
 
-	username := s.State.CurrentUserName
-	userCxt := context.Background()
-	user, err := s.Db.GetUserDetailsByUsername(userCxt, username)
-	if err != nil {
-		return err
-	}
 	userId := user.ID
 	feedId := feedDetails.ID
 

@@ -10,7 +10,7 @@ import (
 	"github.com/theunhackable/gator/internal/models"
 )
 
-func HandlerAddFeed(s *models.State, cmd models.Command) error {
+func HandlerAddFeed(s *models.State, cmd models.Command, user *db.User) error {
 
 	argLen := len(cmd.Arguments)
 	expArgLen := 4
@@ -21,12 +21,6 @@ func HandlerAddFeed(s *models.State, cmd models.Command) error {
 	name := cmd.Arguments[2]
 	url := cmd.Arguments[3]
 
-	username := s.State.CurrentUserName
-	userCtx := context.Background()
-	user, err := s.Db.GetUserDetailsByUsername(userCtx, username)
-	if err != nil {
-		return err
-	}
 	newFeed := db.CreateFeedParams{
 		UserID:    user.ID,
 		Name:      name,
