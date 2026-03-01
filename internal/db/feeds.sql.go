@@ -21,7 +21,7 @@ VALUES (
     $4,
     $5
 )
-RETURNING id, user_id, name, url, created_at, updated_at
+RETURNING id, user_id, name, url, created_at, updated_at, last_fetched_at
 `
 
 type CreateFeedParams struct {
@@ -48,6 +48,7 @@ func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (Feed, e
 		&i.Url,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.LastFetchedAt,
 	)
 	return i, err
 }
@@ -90,7 +91,7 @@ func (q *Queries) GetFeedDetails(ctx context.Context) ([]GetFeedDetailsRow, erro
 
 const getFeedDetailsByUrl = `-- name: GetFeedDetailsByUrl :one
 
-SELECT id, user_id, name, url, created_at, updated_at FROM feeds
+SELECT id, user_id, name, url, created_at, updated_at, last_fetched_at FROM feeds
 WHERE url =  $1
 `
 
@@ -104,8 +105,59 @@ func (q *Queries) GetFeedDetailsByUrl(ctx context.Context, url string) (Feed, er
 		&i.Url,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.LastFetchedAt,
 	)
 	return i, err
+}
+
+const getNextFeedToFetch = `-- name: GetNextFeedToFetch :many
+
+SELECT id, user_id, name, url, created_at, updated_at, last_fetched_at from feeds
+ORDER BY last_fetched_at ASC NULLS FIRST
+LIMIT $1
+`
+
+func (q *Queries) GetNextFeedToFetch(ctx context.Context, limit int32) ([]Feed, error) {
+	rows, err := q.db.QueryContext(ctx, getNextFeedToFetch, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Feed
+	for rows.Next() {
+		var i Feed
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Name,
+			&i.Url,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.LastFetchedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const markFeedFetched = `-- name: MarkFeedFetched :exec
+
+UPDATE feeds
+SET updated_at = NOW() AND last_fetched_at = NOW()
+WHERE id=$1
+`
+
+func (q *Queries) MarkFeedFetched(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, markFeedFetched, id)
+	return err
 }
 
 const resetFeedTable = `-- name: ResetFeedTable :exec
